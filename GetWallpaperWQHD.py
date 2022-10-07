@@ -1,11 +1,15 @@
 import shutil
 import requests
 import bs4
+import re
+import os
 
 headurl = "https://www.ultrawidewallpaper.com"
 page = "/wallpapers?page=1"
-save_path = 'C:\\Users\\Alex\\Pictures\\ultrawidewallpaper.com\\'
+save_path = os.environ["USERPROFILE"] + "/Pictures/ultrawidewallpaper.com2/"
 resolution = "3440x1440"
+
+reg = re.compile('[^a-zA-Z0-9& ]')
 while True:
     html = requests.get(headurl + page).text
     soup_page = bs4.BeautifulSoup(html, 'html.parser')
@@ -18,7 +22,7 @@ while True:
             if res is not None and res.contents[2].replace("\n", "") == resolution:
                 img_ref = soup_paper.find("img", {"id": "show_wallpaper"})
                 wallpaper = img_ref.get("src")
-                name = img_ref.get("alt").replace(" Ultrawide Wallpaper", "").replace("?", "").replace("/", " ")
+                name = reg.sub('',img_ref.get("alt").replace(" Ultrawide Wallpaper", ""))
                 print(name + " " + wallpaper)
                 r = requests.get(wallpaper, stream=True)
                 r.raise_for_status()
